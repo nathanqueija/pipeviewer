@@ -1,48 +1,24 @@
-use std::env;
-use std::io::{self, ErrorKind, Read, Result, Write};
-
-// 16kb max
-const CHUNK_SIZE: usize = 16 * 1024;
+use pipeviewer::{args::Args, read, stats, write};
+use std::io::Result;
 
 fn main() -> Result<()> {
-    let silent = !env::var("PV_SILENT").unwrap_or_default().is_empty();
+    let args = Args::parse();
 
     let mut total_bytes = 0;
-    let mut buffer = [0; CHUNK_SIZE];
 
     loop {
-        // Opening the standard input of the current process. In this case is the terminal.
-        // The standard input is the keyboard.
-        // The read function pulls bytes from the stdin source into the specified buffer and returns
-        // how many bytes were read
-        // In this case the buffer is an array
-        let num_read = match io::stdin().read(&mut buffer) {
-            Ok(0) => break,
+        let buffer = match read::read(&args.infile) {
+            Ok(x) if x.is_empty() => break,
             Ok(x) => x,
             Err(_) => break,
         };
 
-        total_bytes += num_read;
-
-        if !silent {
-            eprintln!("\r{}", total_bytes);
-        }
-
-        // If you use the ? syntax it means that if this operations returns an Error
-        // it will be returned from this function
-        // io::stdout().write_all(&buffer[..num_read])?
-
-        if let Err(e) = io::stdout().write_all(&buffer[..num_read]) {
-            if e.kind() == ErrorKind::BrokenPipe {
-                break;
-            }
-            return Err(e);
+        stats::stats(args.silent, buffer.len(), &mut total_bytes, false);
+        if !write::write(&args.outfile, &buffer)? {
+            break;
         }
     }
-
-    if !silent {
-        eprintln!("\r{}", total_bytes);
-    }
+    stats::stats(args.silent, 0, &mut total_bytes, true);
 
     Ok(())
 }
