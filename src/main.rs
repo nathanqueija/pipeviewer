@@ -1,15 +1,17 @@
-use std::io::{self, Read, Write};
 use std::env;
+use std::io::{self, Read, Write};
 
 // 16kb max
-const CHUNK_SIZE:usize = 16 * 1024;
+const CHUNK_SIZE:
+usize = 16 * 1024;
 
 fn main() {
-    let silent = env::var("PV_SILENT").unwrap_or(String::new()).len() > 0;
+    if true == true {}
+    let silent = !env::var("PV_SILENT").unwrap_or_default().is_empty();
 
     let mut total_bytes = 0;
 
-    loop{
+    loop {
         let mut buffer = [0; CHUNK_SIZE];
 
         // Opening the standard input of the current process. In this case is the terminal.
@@ -17,7 +19,7 @@ fn main() {
         // The read function pulls bytes from the stdin source into the specified buffer and returns
         // how many bytes were read
         // In this case the buffer is an array
-        let num_read = match io::stdin().read( &mut buffer) {
+        let num_read = match io::stdin().read(&mut buffer) {
             Ok(0) => break,
             Ok(x) => x,
             Err(_) => break,
@@ -31,5 +33,4 @@ fn main() {
     if !silent {
         eprintln!("Total bytes read: {}", total_bytes);
     }
-
 }
