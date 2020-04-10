@@ -1,9 +1,11 @@
 use std::io::{self, Read, Write};
+use std::env;
 
 // 16kb max
 const CHUNK_SIZE:usize = 16 * 1024;
 
 fn main() {
+    let silent = env::var("PV_SILENT").unwrap_or(String::new()).len() > 0;
 
     let mut total_bytes = 0;
 
@@ -26,6 +28,8 @@ fn main() {
         io::stdout().write_all(&buffer[..num_read]).unwrap();
     }
 
-    eprintln!("Total bytes read: {}", total_bytes);
+    if !silent {
+        eprintln!("Total bytes read: {}", total_bytes);
+    }
 
 }
