@@ -1,7 +1,7 @@
 # Pipeviewer
 
 This is a project that I'm building while I'm learning Rust.
-Its purpose is to read something from an input and store in a buffer. It currently allows the following inputs:
+Its purpose is to read something from an input and store it in a buffer. It currently allows the following inputs:
 - File
 - If no file input is specified `stdin` will be the fallback
 
